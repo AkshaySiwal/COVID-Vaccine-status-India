@@ -20,18 +20,22 @@ def index():
             else:
                 days = div
         pin = str(request.form['pin'])
+        if 'zerovaccine' in request.form:
+            include_zero_vaccine = True
+        else:
+            include_zero_vaccine = False
         for i in range( days):
             date = (datetime.datetime.today() +  datetime.timedelta(days=i * 7 )).strftime('%d-%m-%Y')
-            centers = details(date=date, pin=pin)
+            centers = details(date=date, pin=pin, include_zero_vaccine=include_zero_vaccine)
             all_centers.update(centers)
     all_centers = sorted(all_centers.items())
     return render_template('index.html', all_centers=all_centers)
 
 @app.route("/notification")
 def notification():
-    return "WILL ADD THIS FEATURE SOON"
+    return "WIlL ADD THIS FEATURE SOON"
 
-def details(date, pin):
+def details(date, pin, include_zero_vaccine):
     base_url = 'https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=%s&date=%s' % (pin, date)
     response = requests.get(base_url)
     print(response.url)
@@ -41,8 +45,13 @@ def details(date, pin):
             date = s['date']
             key = int(''.join(date.split('-')[::-1]))
             available = s.get('available_capacity', 0)
-            if available > 0:
+            if not include_zero_vaccine:
+                print('XXXXXXX', available)
+                if available > 0:
+                    record = {'date' : date, 'center_id': i['center_id'], 'name': i['name'], 'address' : i['address'] + ', ' + i['block_name'] + ', ' + i['district_name'] + ', ' + i['state_name'] + ', ' + str(i['pincode']), 'vaccine': s['vaccine'], 'min_age_limit' : s['min_age_limit'], 'available_capacity': s['available_capacity'], 'fee_type' : i['fee_type']}
+            else:
                 record = {'date' : date, 'center_id': i['center_id'], 'name': i['name'], 'address' : i['address'] + ', ' + i['block_name'] + ', ' + i['district_name'] + ', ' + i['state_name'] + ', ' + str(i['pincode']), 'vaccine': s['vaccine'], 'min_age_limit' : s['min_age_limit'], 'available_capacity': s['available_capacity'], 'fee_type' : i['fee_type']}
+            if record:
                 if key in centers:
                     centers[key].append(record)
                 else:
@@ -51,4 +60,4 @@ def details(date, pin):
 
 
 if __name__ == '__main__':
-    app.run( port=8000 )
+    app.run()
