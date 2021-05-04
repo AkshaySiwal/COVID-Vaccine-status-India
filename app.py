@@ -38,7 +38,6 @@ def notification():
 def details(date, pin, include_zero_vaccine):
     base_url = 'https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=%s&date=%s' % (pin, date)
     response = requests.get(base_url)
-    print(response.url)
     centers = {}
     for i in response.json().get('centers', []):
         for s in i.get('sessions', []):
@@ -46,7 +45,6 @@ def details(date, pin, include_zero_vaccine):
             key = int(''.join(date.split('-')[::-1]))
             available = s.get('available_capacity', 0)
             if not include_zero_vaccine:
-                print('XXXXXXX', available)
                 if available > 0:
                     record = {'date' : date, 'center_id': i['center_id'], 'name': i['name'], 'address' : i['address'] + ', ' + i['block_name'] + ', ' + i['district_name'] + ', ' + i['state_name'] + ', ' + str(i['pincode']), 'vaccine': s['vaccine'], 'min_age_limit' : s['min_age_limit'], 'available_capacity': s['available_capacity'], 'fee_type' : i['fee_type']}
             else:
