@@ -29,7 +29,7 @@ def index():
 
 @app.route("/notification")
 def notification():
-    return "WIlL ADD THIS FEATURE SOON"
+    return "WILL ADD THIS FEATURE SOON"
 
 def details(date, pin):
     base_url = 'https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=%s&date=%s' % (pin, date)
