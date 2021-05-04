@@ -45,6 +45,9 @@ def notification():
 def details(date, pin, include_zero_vaccine, age):
     base_url = 'https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=%s&date=%s' % (pin, date)
     response = requests.get(base_url)
+    print(response.url)
+    print(response.status_code)
+    print(response.json())
     centers = {}
     for i in response.json().get('centers', []):
         for s in i.get('sessions', []):
