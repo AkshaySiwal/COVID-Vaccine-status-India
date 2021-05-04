@@ -24,9 +24,16 @@ def index():
             include_zero_vaccine = True
         else:
             include_zero_vaccine = False
+        group = request.form.get('group')
+        if group.lower() == 'age 18-44':
+            age = 18
+        elif group.lower() == 'age 45+':
+            age = 45
+        else:
+            age = 0
         for i in range( days):
             date = (datetime.datetime.today() +  datetime.timedelta(days=i * 7 )).strftime('%d-%m-%Y')
-            centers = details(date=date, pin=pin, include_zero_vaccine=include_zero_vaccine)
+            centers = details(date=date, pin=pin, include_zero_vaccine=include_zero_vaccine, age=age)
             all_centers.update(centers)
     all_centers = sorted(all_centers.items())
     return render_template('index.html', all_centers=all_centers)
@@ -35,7 +42,7 @@ def index():
 def notification():
     return "WIlL ADD THIS FEATURE SOON"
 
-def details(date, pin, include_zero_vaccine):
+def details(date, pin, include_zero_vaccine, age):
     base_url = 'https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=%s&date=%s' % (pin, date)
     response = requests.get(base_url)
     centers = {}
@@ -44,12 +51,32 @@ def details(date, pin, include_zero_vaccine):
             date = s['date']
             key = int(''.join(date.split('-')[::-1]))
             available = s.get('available_capacity', 0)
+            age_limit = s.get('min_age_limit', 0)
+            age_keep = False
+            zero_keep = False
+            if age == 18:
+                if 18 <= age_limit < 45:
+                    age_keep = True
+                else:
+                    age_keep = False
+            elif age == 45:
+                if age_limit >= 45:
+                    age_keep = True
+                else:
+                    age_keep = False
+            else:
+                age_keep = True
+
             if not include_zero_vaccine:
                 if available > 0:
-                    record = {'date' : date, 'center_id': i['center_id'], 'name': i['name'], 'address' : i['address'] + ', ' + i['block_name'] + ', ' + i['district_name'] + ', ' + i['state_name'] + ', ' + str(i['pincode']), 'vaccine': s['vaccine'], 'min_age_limit' : s['min_age_limit'], 'available_capacity': s['available_capacity'], 'fee_type' : i['fee_type']}
+                    zero_keep = True
+                else:
+                    zero_keep = False
             else:
+                zero_keep = True
+
+            if age_keep and zero_keep:
                 record = {'date' : date, 'center_id': i['center_id'], 'name': i['name'], 'address' : i['address'] + ', ' + i['block_name'] + ', ' + i['district_name'] + ', ' + i['state_name'] + ', ' + str(i['pincode']), 'vaccine': s['vaccine'], 'min_age_limit' : s['min_age_limit'], 'available_capacity': s['available_capacity'], 'fee_type' : i['fee_type']}
-            if record:
                 if key in centers:
                     centers[key].append(record)
                 else:

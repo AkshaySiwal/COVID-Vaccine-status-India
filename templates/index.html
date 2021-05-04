@@ -49,8 +49,23 @@
         <form action="/" method="POST">
   <div class="mb-3">
     <label for="pin" class="form-label">Pin Code</label>
-    <input type="text" class="form-control" name="pin" id="pin" placeholder="Your PIN code">
+    <input type="text" class="form-control" name="pin" id="pin" placeholder="Your PIN code...">
   </div>
+
+
+                            <div class="mb-3">
+        <label for="days" class="form-label">Age Group</label>
+<input class="form-control" list="grouplistOptions" id="group" name="group" placeholder="Age group...">
+<datalist id="grouplistOptions">
+  <option value="All Age">
+  <option value="Age 18-44">
+  <option value="Age 45+">
+</datalist>
+         </div>
+
+
+
+
     <div class="mb-3">
         <label for="days" class="form-label">Days</label>
 <input class="form-control" list="datalistOptions" id="days" name="days" placeholder="Number of days...">
@@ -62,6 +77,12 @@
   <option value="35">
 </datalist>
          </div>
+
+
+
+
+
+
 
             <div class="form-check mb-3">
   <input class="form-check-input" type="checkbox" value="" id="zerovaccine" name="zerovaccine" checked>
