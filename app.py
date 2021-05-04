@@ -47,9 +47,13 @@ def details(date, pin, include_zero_vaccine, age):
     response = requests.get(base_url)
     print(response.url)
     print(response.status_code)
-    print(response.json())
+    print(response.text)
+    if response.status_code // 200 == 2:
+        raw = response.json()
+    else:
+        raw = {'centers' : []}
     centers = {}
-    for i in response.json().get('centers', []):
+    for i in raw.get('centers', []):
         for s in i.get('sessions', []):
             date = s['date']
             key = int(''.join(date.split('-')[::-1]))
